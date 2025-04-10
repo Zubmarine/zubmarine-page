@@ -1,40 +1,47 @@
 import { motion, useScroll, useTransform } from 'motion/react'
-import { type JSX, useMemo } from 'react'
+import { type JSX, useMemo, useRef } from 'react'
 import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 
 import avatarImg from '@assets/avatar.webp'
 import { differenceInCalendarDays } from 'date-fns'
 
-const FloatAvatar = () => {
-  const { scrollY } = useScroll()
-  const verticalThreshold = window.innerHeight * 0.3 - 16
-  const horizontalLimit = Math.max(window.innerWidth * 0.35, window.innerWidth * 0.5 - 128)
+import useWindowDimensions from './useWindowDimensions'
 
-  const scale = useTransform(scrollY, [0, verticalThreshold], [1, 0.35], { clamp: true })
+const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement | null> }) => {
+  const windowDimensions = useWindowDimensions()
 
-  const y = useTransform(scrollY, [0, verticalThreshold], [0, -verticalThreshold * 1.5], { clamp: true })
-
-  const x = useTransform(scrollY, [verticalThreshold, verticalThreshold + horizontalLimit], [0, horizontalLimit], {
-    clamp: true,
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ['start start', 'end start'],
+    layoutEffect: false,
   })
 
+  const verticalOffset = useMemo(() => {
+    return -(windowDimensions.height * 0.3 - 16) * 1.5
+  }, [windowDimensions.height])
+  const horizontalLimit = useMemo(() => {
+    return Math.max(windowDimensions.width * 0.35, windowDimensions.width * 0.5 - 128)
+  }, [windowDimensions.width])
+
+  const scale = useTransform(scrollYProgress, [0, 0.3], [1, 0.35], { clamp: true })
+  const y = useTransform(scrollYProgress, [0, 0.3], [0, verticalOffset], { clamp: true })
+  const x = useTransform(scrollYProgress, [0.3, 1], [0, horizontalLimit], { clamp: true })
+
   return (
-    <motion.img
-      className="fixed top-1/2 left-1/2 z-100 size-64 origin-center -translate-x-1/2 -translate-y-1/2 transform rounded-full ring-8 ring-primary-300"
-      style={{
-        x,
-        y,
-        scale,
-      }}
-      src={avatarImg}
-      alt="Avatar"
-    />
+    <>
+      <motion.img
+        className="fixed top-1/2 left-1/2 z-100 size-64 origin-center -translate-x-1/2 -translate-y-1/2 transform rounded-full ring-8 ring-primary-300"
+        style={{ x, y, scale }}
+        src={avatarImg}
+        alt="Avatar"
+      />
+    </>
   )
 }
 
-const FirstPart = () => {
-  return <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500"></div>
+const FirstPart = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {
+  return <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500" ref={ref}></div>
 }
 
 const SecondPart = () => {
@@ -150,10 +157,11 @@ const SecondPart = () => {
 }
 
 function App() {
+  const firstPartRef = useRef<HTMLDivElement>(null)
   return (
     <main className="flex min-w-screen flex-col text-primary-900">
-      <FloatAvatar />
-      <FirstPart />
+      <FloatAvatar targetRef={firstPartRef} />
+      <FirstPart ref={firstPartRef} />
       <SecondPart />
     </main>
   )
