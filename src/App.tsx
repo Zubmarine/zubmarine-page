@@ -5,6 +5,7 @@ import { FaXTwitter } from 'react-icons/fa6'
 
 import avatarImg from '@assets/avatar.webp'
 import { differenceInCalendarDays } from 'date-fns'
+import { cubicBezier } from 'motion'
 
 import useWindowDimensions from './useWindowDimensions'
 
@@ -24,9 +25,18 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
     return Math.max(windowDimensions.width * 0.35, windowDimensions.width * 0.5 - 128)
   }, [windowDimensions.width])
 
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.35], { clamp: true })
-  const y = useTransform(scrollYProgress, [0, 1], [0, verticalOffset], { clamp: true })
-  const x = useTransform(scrollYProgress, [0, 1], [0, horizontalLimit], { clamp: true })
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.35], {
+    clamp: true,
+    ease: cubicBezier(0.42, 0, 0.58, 1), // Ease-in-out cubic-bezier curve
+  })
+  const y = useTransform(scrollYProgress, [0, 1], [0, verticalOffset], {
+    clamp: true,
+    ease: cubicBezier(0.42, 0, 0.58, 1), // Ease-in-out cubic-bezier curve
+  })
+  const x = useTransform(scrollYProgress, [0, 1], [0, horizontalLimit], {
+    clamp: true,
+    ease: cubicBezier(0.42, 0, 0.58, 1), // Ease-in-out cubic-bezier curve
+  })
 
   return (
     <>
