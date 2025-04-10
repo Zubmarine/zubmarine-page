@@ -25,17 +25,22 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
     return Math.max(windowDimensions.width * 0.35, windowDimensions.width * 0.5 - 128)
   }, [windowDimensions.width])
 
+  // Ease-in-out cubic-bezier curve
+  const ease = useMemo(() => {
+    return cubicBezier(0.42, 0, 0.58, 1)
+  }, [])
+
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.35], {
     clamp: true,
-    ease: cubicBezier(0.42, 0, 0.58, 1), // Ease-in-out cubic-bezier curve
+    ease: ease,
   })
   const y = useTransform(scrollYProgress, [0, 1], [0, verticalOffset], {
     clamp: true,
-    ease: cubicBezier(0.42, 0, 0.58, 1), // Ease-in-out cubic-bezier curve
+    ease: ease,
   })
   const x = useTransform(scrollYProgress, [0, 1], [0, horizontalLimit], {
     clamp: true,
-    ease: cubicBezier(0.42, 0, 0.58, 1), // Ease-in-out cubic-bezier curve
+    ease: ease,
   })
 
   return (
