@@ -39,7 +39,7 @@ const SecondPart = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex h-16 flex-col items-center justify-center bg-primary-500 px-(--padding-page) text-xl font-bold text-primary-50">
+      <div className="sticky top-0 z-100 flex h-16 flex-col items-center justify-center bg-primary-500 px-(--padding-page) text-xl font-bold text-primary-50">
         <span className="w-full max-w-4xl">Zubmarine's Utopia</span>
       </div>
       <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 dark:bg-primary-950 dark:text-primary-50">
@@ -85,6 +85,8 @@ const SecondPart = () => {
           </div>
         </div>
         <div className="flex-1" />
+        {/* TODO: for testing */}
+        <div className="h-[300vh]" />
         <div className="w-full max-w-4xl pb-4">
           Made with <span className="text-red-500">❤</span> by{' '}
           <a href="https://github.com/ShellWen" target="_blank" rel="noreferrer noopener">
