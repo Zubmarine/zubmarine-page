@@ -76,10 +76,11 @@ const SecondPart = () => {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="topbar-blur sticky top-0 z-50 flex h-16 flex-col items-center justify-center bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50">
+    <div className="relative flex min-h-screen flex-col">
+      <div className="sticky top-0 z-50 flex h-16 flex-col items-center justify-center bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50 backdrop-blur-sm">
         <span className="w-full max-w-4xl">Zubmarine&apos;s Utopia</span>
       </div>
+      <div className="absolute inset-0 z-0 h-16 w-full bg-primary-500" />
       <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 dark:bg-primary-950 dark:text-primary-50">
         <div className="h-[5vh]" />
         <div className="flex h-full w-full max-w-4xl flex-col items-center justify-center py-8 md:flex-row md:items-start md:gap-8 md:py-12">
