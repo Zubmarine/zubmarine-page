@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+@theme {
+  /* generated from https://uicolors.app/create */
+  --color-primary: var(--color-primary-500);
+  --color-primary-50: oklch(97.64% 0.01 233.74);
+  --color-primary-100: oklch(94.83% 0.03 239.65);
+  --color-primary-200: oklch(89.75% 0.06 232.51);
+  --color-primary-300: oklch(82.31% 0.11 231.11);
+  --color-primary-400: oklch(75.46% 0.15 234.58);
+  --color-primary-500: oklch(70.73% 0.17 242.1);
+  --color-primary-600: oklch(59.28% 0.16 246.75);
+  --color-primary-700: oklch(50.35% 0.13 247.13);
+  --color-primary-800: oklch(44.24% 0.11 245.7);
+  --color-primary-900: oklch(39.13% 0.09 244.74);
+  --color-primary-950: oklch(29.22% 0.07 246.44);
+
+  --padding-page: calc(var(--spacing) * 8);
+}
