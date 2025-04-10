@@ -1,4 +1,5 @@
-import { type JSX, useCallback, useEffect, useMemo, useState } from 'react'
+import { motion, useScroll, useTransform } from 'motion/react'
+import { type JSX, useMemo } from 'react'
 import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 
@@ -6,79 +7,25 @@ import avatarImg from '@assets/avatar.webp'
 import { differenceInCalendarDays } from 'date-fns'
 
 const FloatAvatar = () => {
-  // 合并状态管理，减少渲染次数
-  const [uiState, setUiState] = useState({
-    scrollY: 0,
-    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 0,
-    windowHeight: typeof window !== 'undefined' ? window.innerHeight : 0,
+  const { scrollY } = useScroll()
+  const verticalThreshold = window.innerHeight * 0.3 - 16
+  const horizontalLimit = Math.max(window.innerWidth * 0.35, window.innerWidth * 0.5 - 128)
+
+  const scale = useTransform(scrollY, [0, verticalThreshold], [1, 0.35], { clamp: true })
+
+  const y = useTransform(scrollY, [0, verticalThreshold], [0, -verticalThreshold * 1.5], { clamp: true })
+
+  const x = useTransform(scrollY, [verticalThreshold, verticalThreshold + horizontalLimit], [0, horizontalLimit], {
+    clamp: true,
   })
 
-  // 使用 useCallback 优化事件处理器
-  const handleScroll = useCallback(() => {
-    setUiState((prev) => ({ ...prev, scrollY: window.scrollY }))
-  }, [])
-
-  const handleResize = useCallback(() => {
-    setUiState((prev) => ({
-      ...prev,
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
-    }))
-    // 强制同步滚动位置更新
-    handleScroll()
-  }, [handleScroll]) // 添加 handleScroll 依赖
-
-  useEffect(() => {
-    // 初始化时立即获取准确尺寸
-    handleResize()
-
-    // 使用防抖优化 resize 事件
-    let resizeTimer: ReturnType<typeof setTimeout>
-    const resizeListener = () => {
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(handleResize, 100)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', resizeListener)
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', resizeListener)
-      clearTimeout(resizeTimer)
-    }
-  }, [handleScroll, handleResize])
-
-  // 动态计算关键参数（每次渲染都重新计算）
-  const verticalThreshold = uiState.windowHeight * 0.3 - 16
-  const horizontalLimit = Math.max(uiState.windowWidth * 0.35, uiState.windowWidth * 0.5 - 128)
-
-  let scale = 1
-  let translateY = 0
-  let translateX = 0
-
-  // 基于最新状态计算动画参数
-  if (uiState.scrollY <= verticalThreshold) {
-    scale = Math.max(0.35, 1 - (uiState.scrollY / verticalThreshold) * 0.35)
-    translateY = -uiState.scrollY * 1
-  } else {
-    scale = 0.35
-    translateY = -verticalThreshold * 1.5
-    translateX = Math.min(horizontalLimit, (uiState.scrollY - verticalThreshold) * 1)
-  }
-
   return (
-    <img
-      className="fixed top-1/2 left-1/2 z-100 size-64 origin-center transform rounded-full ring-8 ring-primary-300 transition-transform duration-300 ease-out"
+    <motion.img
+      className="fixed top-1/2 left-1/2 z-100 size-64 origin-center -translate-x-1/2 -translate-y-1/2 transform rounded-full ring-8 ring-primary-300"
       style={{
-        transform: `
-        translate(-50%, -50%)
-        translateX(${translateX}px)
-        translateY(${translateY}px)
-        scale(${scale})
-        `,
-        transition: `0.1s`,
-        willChange: 'transform',
+        x,
+        y,
+        scale,
       }}
       src={avatarImg}
       alt="Avatar"
@@ -87,7 +34,6 @@ const FloatAvatar = () => {
 }
 
 const FirstPart = () => {
-  // return <div className="h-screen bg-primary-500"></div>
   return <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500"></div>
 }
 
