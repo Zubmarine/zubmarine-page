@@ -87,7 +87,7 @@ const SecondPart = () => {
     const birthDay = new Date('2006-02-06');
     const currentDate = new Date();
     const daysPassed = differenceInCalendarDays(currentDate, birthDay);
-    return daysPassed + "天"
+    return daysPassed + " 天"
   }, [])
   
 
