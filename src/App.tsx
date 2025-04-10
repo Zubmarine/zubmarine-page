@@ -24,9 +24,9 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
     return Math.max(windowDimensions.width * 0.35, windowDimensions.width * 0.5 - 128)
   }, [windowDimensions.width])
 
-  const scale = useTransform(scrollYProgress, [0, 0.3], [1, 0.35], { clamp: true })
-  const y = useTransform(scrollYProgress, [0, 0.3], [0, verticalOffset], { clamp: true })
-  const x = useTransform(scrollYProgress, [0.3, 1], [0, horizontalLimit], { clamp: true })
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.35], { clamp: true })
+  const y = useTransform(scrollYProgress, [0, 1], [0, verticalOffset], { clamp: true })
+  const x = useTransform(scrollYProgress, [0, 1], [0, horizontalLimit], { clamp: true })
 
   return (
     <>
