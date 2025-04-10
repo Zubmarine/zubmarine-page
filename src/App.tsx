@@ -1,84 +1,84 @@
-import { useMemo, useState, useEffect, useCallback } from 'react'
-import { differenceInCalendarDays } from 'date-fns'
+import { type JSX, useCallback, useEffect, useMemo, useState } from 'react'
 import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 
 import avatarImg from '@assets/avatar.webp'
+import { differenceInCalendarDays } from 'date-fns'
 
 const FloatAvatar = () => {
   // 合并状态管理，减少渲染次数
   const [uiState, setUiState] = useState({
     scrollY: 0,
     windowWidth: typeof window !== 'undefined' ? window.innerWidth : 0,
-    windowHeight: typeof window !== 'undefined' ? window.innerHeight : 0
-  });
+    windowHeight: typeof window !== 'undefined' ? window.innerHeight : 0,
+  })
 
   // 使用 useCallback 优化事件处理器
   const handleScroll = useCallback(() => {
-    setUiState(prev => ({ ...prev, scrollY: window.scrollY }));
-  }, []);
+    setUiState((prev) => ({ ...prev, scrollY: window.scrollY }))
+  }, [])
 
   const handleResize = useCallback(() => {
-    setUiState(prev => ({
+    setUiState((prev) => ({
       ...prev,
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
-    }));
+      windowHeight: window.innerHeight,
+    }))
     // 强制同步滚动位置更新
-    handleScroll();
-  }, [handleScroll]); // 添加 handleScroll 依赖
+    handleScroll()
+  }, [handleScroll]) // 添加 handleScroll 依赖
 
   useEffect(() => {
     // 初始化时立即获取准确尺寸
-    handleResize();
-    
-    // 使用防抖优化 resize 事件
-    let resizeTimer;
-    const resizeListener = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(handleResize, 100);
-    };
+    handleResize()
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', resizeListener);
+    // 使用防抖优化 resize 事件
+    let resizeTimer: ReturnType<typeof setTimeout>
+    const resizeListener = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(handleResize, 100)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', resizeListener)
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', resizeListener);
-      clearTimeout(resizeTimer);
-    };
-  }, [handleScroll, handleResize]);
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', resizeListener)
+      clearTimeout(resizeTimer)
+    }
+  }, [handleScroll, handleResize])
 
   // 动态计算关键参数（每次渲染都重新计算）
-  const verticalThreshold = uiState.windowHeight * 0.3 - 16;
-  const horizontalLimit = Math.max(uiState.windowWidth * 0.35, uiState.windowWidth * 0.5 - 128);
+  const verticalThreshold = uiState.windowHeight * 0.3 - 16
+  const horizontalLimit = Math.max(uiState.windowWidth * 0.35, uiState.windowWidth * 0.5 - 128)
 
-  let scale = 1;
-  let translateY = 0;
-  let translateX = 0;
+  let scale = 1
+  let translateY = 0
+  let translateX = 0
 
   // 基于最新状态计算动画参数
   if (uiState.scrollY <= verticalThreshold) {
-    scale = Math.max(0.35, 1 - (uiState.scrollY / verticalThreshold) * 0.35);
-    translateY = -uiState.scrollY * 1;
+    scale = Math.max(0.35, 1 - (uiState.scrollY / verticalThreshold) * 0.35)
+    translateY = -uiState.scrollY * 1
   } else {
-    scale = 0.35;
-    translateY = -verticalThreshold * 1.5;
-    translateX = Math.min(horizontalLimit, (uiState.scrollY - verticalThreshold) * 1);
+    scale = 0.35
+    translateY = -verticalThreshold * 1.5
+    translateX = Math.min(horizontalLimit, (uiState.scrollY - verticalThreshold) * 1)
   }
 
   return (
     <img
-      className="fixed transform z-100 top-1/2 left-1/2 size-64 origin-center transition-transform duration-300 ease-out rounded-full ring-8 ring-primary-300"
+      className="fixed top-1/2 left-1/2 z-100 size-64 origin-center transform rounded-full ring-8 ring-primary-300 transition-transform duration-300 ease-out"
       style={{
-        transform:`
+        transform: `
         translate(-50%, -50%)
         translateX(${translateX}px)
         translateY(${translateY}px)
         scale(${scale})
         `,
         transition: `0.1s`,
-        willChange: "transform",
+        willChange: 'transform',
       }}
       src={avatarImg}
       alt="Avatar"
@@ -94,12 +94,11 @@ const FirstPart = () => {
 const SecondPart = () => {
   // 前置数据
   const elapsedTime = useMemo(() => {
-    const birthDay = new Date('2006-02-06');
-    const currentDate = new Date();
-    const daysPassed = differenceInCalendarDays(currentDate, birthDay);
-    return daysPassed + " 天"
+    const birthDay = new Date('2006-02-06')
+    const currentDate = new Date()
+    const daysPassed = differenceInCalendarDays(currentDate, birthDay)
+    return daysPassed + ' 天'
   }, [])
-  
 
   // 基础资料
   const basicInfo = useMemo(() => {
@@ -113,33 +112,32 @@ const SecondPart = () => {
     ]
   }, [elapsedTime])
 
+  type ExternalLink = [{ key: string; icon: JSX.Element }, string, string]
   // 外部链接
-  const externalLinks = useMemo(() => {
+  const externalLinks: ExternalLink[] = useMemo(() => {
     return [
-      [{key: 'GitHub', icon: <FaGithub />}, '@Zubmarine', 'https://github.com/Zubmarine',],
-      [{key: 'X', icon: <FaXTwitter />}, '@AbyssumMaris', 'https://x.com/AbyssumMaris'],
-      [{key: 'Telegram', icon: <FaTelegram />}, '@Sier Zubmarine', 'https://t.me/Zubmar1ne'],
+      [{ key: 'GitHub', icon: <FaGithub /> }, '@Zubmarine', 'https://github.com/Zubmarine'],
+      [{ key: 'X', icon: <FaXTwitter /> }, '@AbyssumMaris', 'https://x.com/AbyssumMaris'],
+      [{ key: 'Telegram', icon: <FaTelegram /> }, '@Sier Zubmarine', 'https://t.me/Zubmar1ne'],
     ]
   }, [])
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="sticky top-0 z-50 flex h-16 flex-col items-center justify-center 
-      topbar-blur bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50">
+      <div className="topbar-blur sticky top-0 z-50 flex h-16 flex-col items-center justify-center bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50">
         <span className="w-full max-w-4xl">Zubmarine&apos;s Utopia</span>
       </div>
-      <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 
-      dark:bg-primary-950 dark:text-primary-50">
-        <div className='h-[5vh]' />
+      <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 dark:bg-primary-950 dark:text-primary-50">
+        <div className="h-[5vh]" />
         <div className="flex h-full w-full max-w-4xl flex-col items-center justify-center py-8 md:flex-row md:items-start md:gap-8 md:py-12">
           {/* 左侧内容 */}
           <div className="flex w-full max-w-md flex-col items-center md:items-start">
             {/* 序言 */}
             <section className="mb-8 w-full text-center md:text-left">
               <h2 className="text-4xl font-bold">理想国之春</h2>
-              <div className='h-[0.5em]'></div>
+              <div className="h-[0.5em]"></div>
               <p className="mt-2 text-lg">闲来侧眼新垂柳，烟消水暖风轻。寻寻觅觅盼新晴，天苍茫处，有赤鹿食苹。</p>
-              <p className='mt-2 text-lg'>高歌对酌清梦醒，云闲日朗波平。悠悠念念忆曾经，付诸一笑，听野鹤和鸣。</p>
+              <p className="mt-2 text-lg">高歌对酌清梦醒，云闲日朗波平。悠悠念念忆曾经，付诸一笑，听野鹤和鸣。</p>
             </section>
 
             {/* 基础资料 */}
@@ -181,14 +179,19 @@ const SecondPart = () => {
           <p>如有问题请致电赛博移民委员会</p>
           <p>
             {' '}
-            <a href="https://s1.imagehub.cc/images/2025/04/10/d2a96881ad4298d541445b6ca06609a3.jpg" target="_blank" rel="noreferrer noopener">
-              <span className='text-primary-500'>+86 178 B04E CC3F</span>
+            <a
+              href="https://s1.imagehub.cc/images/2025/04/10/d2a96881ad4298d541445b6ca06609a3.jpg"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <span className="text-primary-500">+86 178 B04E CC3F</span>
             </a>
           </p>
         </div>
-        <div className='h-[100vh]' />
+        <div className="h-[100vh]" />
         <div className="w-full max-w-4xl pb-4">
-          <p>Made with <span className="text-red-500">❤</span> by{' '}
+          <p>
+            Made with <span className="text-red-500">❤</span> by{' '}
             <a href="https://github.com/ShellWen" target="_blank" rel="noreferrer noopener">
               ShellWen
             </a>
