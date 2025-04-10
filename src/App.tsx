@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { FaGithub } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 
 import avatarImg from '@assets/avatar.webp'
 
@@ -32,15 +34,15 @@ const SecondPart = () => {
   // 外部链接
   const externalLinks = useMemo(() => {
     return [
-      ['GitHub', '@Zubmarine', 'https://github.com/Zubmarine'],
-      ['X', '@AbyssumMaris', 'https://x.com/AbyssumMaris'],
+      [{key: 'GitHub', icon: <FaGithub />}, '@Zubmarine', 'https://github.com/Zubmarine',],
+      [{key: 'X', icon: <FaXTwitter />}, '@AbyssumMaris', 'https://x.com/AbyssumMaris'],
     ]
   }, [])
 
   return (
     <div className="flex min-h-screen flex-col">
       <div className="sticky top-0 z-100 flex h-16 flex-col items-center justify-center bg-primary-500 px-(--padding-page) text-xl font-bold text-primary-50">
-        <span className="w-full max-w-4xl">Zubmarine's Utopia</span>
+        <span className="w-full max-w-4xl">Zubmarine&apos;s Utopia</span>
       </div>
       <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 dark:bg-primary-950 dark:text-primary-50">
         <div className="flex h-full w-full max-w-4xl flex-col items-center justify-center py-8 md:flex-row md:items-start md:gap-8 md:py-12">
@@ -48,8 +50,10 @@ const SecondPart = () => {
           <div className="flex w-full max-w-md flex-col items-center md:items-start">
             {/* 序言 */}
             <section className="mb-8 w-full text-center md:text-left">
-              <h2 className="text-4xl font-bold">理想国</h2>
-              <p className="mt-2 text-lg">春弦拂娇柳，骚人咏玉竹</p>
+              <h2 className="text-4xl font-bold">理想国之春</h2>
+              <div className='h-[0.5em]'></div>
+              <p className="mt-2 text-lg">闲来侧眼新垂柳，烟消水暖风轻。寻寻觅觅盼新晴，天苍茫处，有赤鹿食苹。</p>
+              <p className='mt-2 text-lg'>高歌对酌清梦醒，云闲日朗波平。悠悠念念忆曾经，付诸一笑，听野鹤和鸣。</p>
             </section>
 
             {/* 基础资料 */}
@@ -73,8 +77,8 @@ const SecondPart = () => {
               <h2 className="mb-4 text-4xl font-bold">外部链接</h2>
               <ul className="grid w-full grid-cols-[auto_1fr] gap-y-2 text-lg md:w-auto">
                 {externalLinks.map(([name, value, link]) => (
-                  <li key={name} className="contents">
-                    <span className="pr-4 font-bold text-primary-500 dark:text-primary-300">{name}</span>
+                  <li key={name.key} className="contents">
+                    <span className="pr-4 text-2xl text-primary-500 dark:text-primary-50">{name.icon}</span>
                     <a href={link} className="text-primary-700 underline dark:text-primary-500">
                       {value}
                     </a>
@@ -86,7 +90,15 @@ const SecondPart = () => {
         </div>
         <div className="flex-1" />
         {/* TODO: for testing */}
-        <div className="h-[300vh]" />
+        <div className="h-[100px]" />
+        <div className="w-full max-w-md scroll-mb-5">
+          <p>如有问题请致电赛博移民委员会  -  {' '}
+            <a href="https://pbs.twimg.com/media/GijPoqHakAALT_J?format=jpg&name=small" target="_blank" rel="noreferrer noopener">
+              <span className='text-primary-500'>+86 178 B04E CC3F</span>
+            </a>
+          </p>
+        </div>
+        <div className='h-[100vh]' />
         <div className="w-full max-w-4xl pb-4">
           Made with <span className="text-red-500">❤</span> by{' '}
           <a href="https://github.com/ShellWen" target="_blank" rel="noreferrer noopener">
