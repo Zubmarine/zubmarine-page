@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { FaGithub } from 'react-icons/fa'
+import { differenceInCalendarDays } from 'date-fns'
+import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 
 import avatarImg from '@assets/avatar.webp'
@@ -20,31 +21,48 @@ const FirstPart = () => {
 }
 
 const SecondPart = () => {
+  // 前置数据
+  const elapsedTime = useMemo(() => {
+    const birthDay = new Date('2006-02-06');
+    const currentDate = new Date();
+    const daysPassed = differenceInCalendarDays(currentDate, birthDay);
+    return daysPassed + "天"
+  }, [])
+  
+
   // 基础资料
   const basicInfo = useMemo(() => {
     return [
       ['编号', 'Zubmarine'],
-      ['内容物', '基于 Cogito-Existo 协议存在的人类实体'],
+      ['内容', '基于 Cogito-Existo 协议存在的人类实体'],
       ['别称', '希尔 / Corlz'],
       ['坐标', 'Guangdong, China'],
-      ['其他', '待续'],
+      ['存在', elapsedTime],
+      ['其他', '...'],
     ]
-  }, [])
+  }, [elapsedTime])
 
   // 外部链接
   const externalLinks = useMemo(() => {
     return [
       [{key: 'GitHub', icon: <FaGithub />}, '@Zubmarine', 'https://github.com/Zubmarine',],
       [{key: 'X', icon: <FaXTwitter />}, '@AbyssumMaris', 'https://x.com/AbyssumMaris'],
+      [{key: 'Telegram', icon: <FaTelegram />}, '@Sier Zubmarine', 'https://t.me/Zubmar1ne'],
     ]
   }, [])
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="sticky top-0 z-100 flex h-16 flex-col items-center justify-center bg-primary-500 px-(--padding-page) text-xl font-bold text-primary-50">
+      <div className="absolute h-[100vh]">
+        <div className="fixed -z-50 h-[100vh] bg-primary-500" />
+      </div>
+      <div className="sticky top-0 z-100 flex h-16 flex-col items-center justify-center 
+      topbar-blur bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50">
         <span className="w-full max-w-4xl">Zubmarine&apos;s Utopia</span>
       </div>
-      <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 dark:bg-primary-950 dark:text-primary-50">
+      <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 
+      dark:bg-primary-950 dark:text-primary-50">
+        <div className='h-[5vh]' />
         <div className="flex h-full w-full max-w-4xl flex-col items-center justify-center py-8 md:flex-row md:items-start md:gap-8 md:py-12">
           {/* 左侧内容 */}
           <div className="flex w-full max-w-md flex-col items-center md:items-start">
@@ -92,8 +110,10 @@ const SecondPart = () => {
         {/* TODO: for testing */}
         <div className="h-[100px]" />
         <div className="w-full max-w-md scroll-mb-5">
-          <p>如有问题请致电赛博移民委员会  -  {' '}
-            <a href="https://pbs.twimg.com/media/GijPoqHakAALT_J?format=jpg&name=small" target="_blank" rel="noreferrer noopener">
+          <p>如有问题请致电赛博移民委员会</p>
+          <p>
+            {' '}
+            <a href="https://s1.imagehub.cc/images/2025/04/10/d2a96881ad4298d541445b6ca06609a3.jpg" target="_blank" rel="noreferrer noopener">
               <span className='text-primary-500'>+86 178 B04E CC3F</span>
             </a>
           </p>

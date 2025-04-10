@@ -17,3 +17,7 @@
 
   --padding-page: calc(var(--spacing) * 8);
 }
+
+.topbar-blur {
+  backdrop-filter: blur(10px);
+}
