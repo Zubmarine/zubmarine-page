@@ -6,56 +6,65 @@ import { FaXTwitter } from 'react-icons/fa6'
 import avatarImg from '@assets/avatar.webp'
 
 const FloatAvatar = () => {
-  const [scrollY, setScrollY] = useState(0);
-  const [windowSize, setWindowSize] = useState({
-    width: 0,
-    height: 0,
+  // 合并状态管理，减少渲染次数
+  const [uiState, setUiState] = useState({
+    scrollY: 0,
+    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 0,
+    windowHeight: typeof window !== 'undefined' ? window.innerHeight : 0
   });
-  
+
+  // 使用 useCallback 优化事件处理器
   const handleScroll = useCallback(() => {
-      setScrollY(window.scrollY)
-    }, []);
-    const handleResize = useCallback(() => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }, []);
+    setUiState(prev => ({ ...prev, scrollY: window.scrollY }));
+  }, []);
+
+  const handleResize = useCallback(() => {
+    setUiState(prev => ({
+      ...prev,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    }));
+    // 强制同步滚动位置更新
+    handleScroll();
+  }, [handleScroll]); // 添加 handleScroll 依赖
 
   useEffect(() => {
-    let animationFrameId;
-
-    const optimizedScrollHandler = () => {
-      animationFrameId ??= requestAnimationFrame(() => {
-          handleScroll();
-          animationFrameId = null;
-        });
+    // 初始化时立即获取准确尺寸
+    handleResize();
+    
+    // 使用防抖优化 resize 事件
+    let resizeTimer;
+    const resizeListener = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(handleResize, 100);
     };
 
-    window.addEventListener('scroll', optimizedScrollHandler, { passive: true });
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', resizeListener);
 
     return () => {
-      window.removeEventListener('scroll', optimizedScrollHandler);
-      window.removeEventListener('resize', handleResize);
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', resizeListener);
+      clearTimeout(resizeTimer);
     };
   }, [handleScroll, handleResize]);
 
-  const verticalThreshold = windowSize.height * 0.21;
-  const horizontalLimit = -windowSize.width * 0.4;
+  // 动态计算关键参数（每次渲染都重新计算）
+  const verticalThreshold = uiState.windowHeight * 0.3 - 16;
+  const horizontalLimit = Math.max(uiState.windowWidth * 0.35, uiState.windowWidth * 0.5 - 128);
 
   let scale = 1;
   let translateY = 0;
   let translateX = 0;
 
-  if(scrollY <= verticalThreshold) {
-    scale = Math.max(0.35, 1 - (scrollY / verticalThreshold) * 0.35);
-    translateY = -scrollY * 1;
+  // 基于最新状态计算动画参数
+  if (uiState.scrollY <= verticalThreshold) {
+    scale = Math.max(0.35, 1 - (uiState.scrollY / verticalThreshold) * 0.35);
+    translateY = -uiState.scrollY * 1;
   } else {
     scale = 0.35;
-    translateY = -verticalThreshold * 2;
-    translateX = Math.max(horizontalLimit, -(scrollY - verticalThreshold) * 1);
+    translateY = -verticalThreshold * 1.5;
+    translateX = Math.min(horizontalLimit, (uiState.scrollY - verticalThreshold) * 1);
   }
 
   return (
@@ -68,7 +77,8 @@ const FloatAvatar = () => {
         translateY(${translateY}px)
         scale(${scale})
         `,
-        transition: `0.1s`
+        transition: `0.1s`,
+        willChange: "transform",
       }}
       src={avatarImg}
       alt="Avatar"
