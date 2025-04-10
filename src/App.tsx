@@ -120,10 +120,12 @@ const SecondPart = () => {
         </div>
         <div className='h-[100vh]' />
         <div className="w-full max-w-4xl pb-4">
-          Made with <span className="text-red-500">❤</span> by{' '}
-          <a href="https://github.com/ShellWen" target="_blank" rel="noreferrer noopener">
-            ShellWen
-          </a>
+          <p>Made with <span className="text-red-500">❤</span> by{' '}
+            <a href="https://github.com/ShellWen" target="_blank" rel="noreferrer noopener">
+              ShellWen
+            </a>
+          </p>
+          <p>Maintained by Zubmarine</p>
         </div>
       </div>
     </div>
