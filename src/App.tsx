@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { differenceInCalendarDays } from 'date-fns'
 import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
@@ -6,9 +6,70 @@ import { FaXTwitter } from 'react-icons/fa6'
 import avatarImg from '@assets/avatar.webp'
 
 const FloatAvatar = () => {
+  const [scrollY, setScrollY] = useState(0);
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+    height: 0,
+  });
+  
+  const handleScroll = useCallback(() => {
+      setScrollY(window.scrollY)
+    }, []);
+    const handleResize = useCallback(() => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }, []);
+
+  useEffect(() => {
+    let animationFrameId;
+
+    const optimizedScrollHandler = () => {
+      animationFrameId ??= requestAnimationFrame(() => {
+          handleScroll();
+          animationFrameId = null;
+        });
+    };
+
+    window.addEventListener('scroll', optimizedScrollHandler, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('scroll', optimizedScrollHandler);
+      window.removeEventListener('resize', handleResize);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [handleScroll, handleResize]);
+
+  const verticalThreshold = windowSize.height * 0.21;
+  const horizontalLimit = -windowSize.width * 0.4;
+
+  let scale = 1;
+  let translateY = 0;
+  let translateX = 0;
+
+  if(scrollY <= verticalThreshold) {
+    scale = Math.max(0.35, 1 - (scrollY / verticalThreshold) * 0.35);
+    translateY = -scrollY * 1;
+  } else {
+    scale = 0.35;
+    translateY = -verticalThreshold * 2;
+    translateX = Math.max(horizontalLimit, -(scrollY - verticalThreshold) * 1);
+  }
+
   return (
     <img
-      className="fixed top-1/2 left-1/2 size-64 -translate-x-1/2 -translate-y-1/2 rounded-full ring-8 ring-primary-300"
+      className="fixed transform z-100 top-1/2 left-1/2 size-64 origin-center transition-transform duration-300 ease-out rounded-full ring-8 ring-primary-300"
+      style={{
+        transform:`
+        translate(-50%, -50%)
+        translateX(${translateX}px)
+        translateY(${translateY}px)
+        scale(${scale})
+        `,
+        transition: `0.1s`
+      }}
       src={avatarImg}
       alt="Avatar"
     />
@@ -53,10 +114,7 @@ const SecondPart = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="absolute h-[100vh]">
-        <div className="fixed -z-50 h-[100vh] bg-primary-500" />
-      </div>
-      <div className="sticky top-0 z-100 flex h-16 flex-col items-center justify-center 
+      <div className="sticky top-0 z-50 flex h-16 flex-col items-center justify-center 
       topbar-blur bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50">
         <span className="w-full max-w-4xl">Zubmarine&apos;s Utopia</span>
       </div>
