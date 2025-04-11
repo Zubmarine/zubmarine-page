@@ -19,7 +19,8 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
     offset: ['start start', 'end start'],
     layoutEffect: false,
   })
-
+  
+  // 计算偏移量
   const verticalOffset = useMemo(() => {
     return -(windowDimensions.height * 0.3 - 16) * 1.5
   }, [windowDimensions.height])
@@ -45,11 +46,22 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
     ease: ease,
   })
 
+  // 添加旋转动画
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360], {
+    clamp: true,
+    ease: ease,
+  })
+
   return (
     <>
       <motion.img
         className="fixed top-1/2 left-1/2 z-100 size-64 origin-center -translate-x-1/2 -translate-y-1/2 transform rounded-full ring-8 ring-primary-300"
-        style={{ x, y, scale }}
+        style={{
+          x,
+          y,
+          scale,
+          rotate, // 添加旋转属性
+        }}
         src={avatarImg}
         alt="Avatar"
       />
@@ -87,10 +99,21 @@ const FadeElement = ({
 }
 
 const FirstPart = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {
+  const handleScrollDown = () => {
+    const windowHeight = window.innerHeight
+    window.scrollTo({
+      top: windowHeight,
+      behavior: 'smooth',
+    })
+  }
+
   return (
     <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500" ref={ref}>
-      <FadeElement targetRef={ref} className="absolute bottom-16 left-1/2 -translate-x-1/2">
-        <HiOutlineChevronDoubleDown className="text-4xl text-white" />
+      <FadeElement targetRef={ref} className="absolute bottom-16 left-1/2 -translate-x-1/2 cursor-pointer">
+        <HiOutlineChevronDoubleDown
+          className="text-4xl text-white transition-transform hover:scale-110"
+          onClick={handleScrollDown}
+        />
       </FadeElement>
     </div>
   )
