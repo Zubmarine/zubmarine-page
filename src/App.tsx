@@ -1,7 +1,9 @@
 import { motion, useScroll, useTransform } from 'motion/react'
-import { type JSX, useMemo, useRef } from 'react'
+import React from 'react'
+import { type JSX, ReactNode, useMemo, useRef } from 'react'
 import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi'
 
 import avatarImg from '@assets/avatar.webp'
 import { differenceInCalendarDays } from 'date-fns'
@@ -55,11 +57,46 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
   )
 }
 
-const FirstPart = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {
-  return <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500" ref={ref}></div>
+interface FadeElementProps {
+  children: ReactNode
+  targetRef: React.RefObject<HTMLElement | null>
+  className?: string
+  fadeRange?: [number, number] // 渐变范围
+  opacityRange?: [number, number] // 透明度范围
 }
 
-const SecondPart = () => {
+const FadeElement = ({
+  children,
+  targetRef,
+  className = '',
+  fadeRange = [0, 0.1],
+  opacityRange = [1, 0],
+}: FadeElementProps) => {
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ['start start', 'end start'],
+  })
+
+  const opacity = useTransform(scrollYProgress, fadeRange, opacityRange)
+
+  return (
+    <motion.div style={{ opacity }} className={className}>
+      {children}
+    </motion.div>
+  )
+}
+
+const FirstPart = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {
+  return (
+    <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500" ref={ref}>
+      <FadeElement targetRef={ref} className="absolute bottom-16 left-1/2 -translate-x-1/2">
+        <HiOutlineChevronDoubleDown className="text-4xl text-white" />
+      </FadeElement>
+    </div>
+  )
+}
+
+const SecondPart = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement | null> }) => {
   // 前置数据
   const elapsedTime = useMemo(() => {
     const birthDay = new Date('2006-02-06')
@@ -93,7 +130,9 @@ const SecondPart = () => {
   return (
     <div className="relative flex min-h-screen flex-col">
       <div className="sticky top-0 z-50 flex h-16 flex-col items-center justify-center bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50 backdrop-blur-sm">
-        <span className="w-full max-w-4xl">Zubmarine&apos;s Utopia</span>
+        <FadeElement targetRef={targetRef} fadeRange={[0.1, 0.2]} opacityRange={[0, 1]} className="w-full max-w-4xl">
+          Zubmarine&apos;s Utopia
+        </FadeElement>
       </div>
       <div className="absolute inset-0 z-0 h-16 w-full bg-primary-500" />
       <div className="z-10 flex flex-1 flex-col items-center bg-primary-50 px-(--padding-page) text-primary-900 dark:bg-primary-950 dark:text-primary-50">
@@ -178,7 +217,7 @@ function App() {
     <main className="flex min-w-screen flex-col text-primary-900">
       <FloatAvatar targetRef={firstPartRef} />
       <FirstPart ref={firstPartRef} />
-      <SecondPart />
+      <SecondPart targetRef={firstPartRef} />
     </main>
   )
 }
