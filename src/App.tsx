@@ -1,9 +1,10 @@
 import { motion, useScroll, useTransform } from 'motion/react'
-import React from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { type JSX, ReactNode, useMemo, useRef } from 'react'
 import { FaGithub, FaTelegram } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi'
+import { AnimatePresence } from 'motion/react'
 
 import avatarImg from '@assets/avatar.webp'
 import { differenceInCalendarDays } from 'date-fns'
@@ -19,7 +20,7 @@ const FloatAvatar = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement 
     offset: ['start start', 'end start'],
     layoutEffect: false,
   })
-  
+
   // 计算偏移量
   const verticalOffset = useMemo(() => {
     return -(windowDimensions.height * 0.3 - 16) * 1.5
@@ -111,7 +112,7 @@ const FirstPart = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => 
     <div className="h-[calc(100vh-var(--spacing)*16)] bg-primary-500" ref={ref}>
       <FadeElement targetRef={ref} className="absolute bottom-16 left-1/2 -translate-x-1/2 cursor-pointer">
         <HiOutlineChevronDoubleDown
-          className="text-4xl text-white transition-transform hover:scale-110"
+          className="text-6xl text-white transition-transform hover:scale-110"
           onClick={handleScrollDown}
         />
       </FadeElement>
@@ -152,7 +153,7 @@ const SecondPart = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement |
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      <div className="sticky top-0 z-50 flex h-16 flex-col items-center justify-center bg-primary-500/20 px-(--padding-page) text-xl font-bold text-primary-50 backdrop-blur-sm">
+      <div className="sticky top-0 z-50 flex h-16 flex-col items-center justify-center bg-primary-500/20 px-(--padding-page) text-xl font-bold dark:text-primary-50 text-primary-950 backdrop-blur-sm">
         <FadeElement targetRef={targetRef} fadeRange={[0.1, 0.2]} opacityRange={[0, 1]} className="w-full max-w-4xl">
           Zubmarine&apos;s Utopia
         </FadeElement>
@@ -209,14 +210,7 @@ const SecondPart = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement |
         <div className="w-full max-w-md scroll-mb-5">
           <p>如有问题请致电赛博移民委员会</p>
           <p>
-            {' '}
-            <a
-              href="https://s1.imagehub.cc/images/2025/04/10/d2a96881ad4298d541445b6ca06609a3.jpg"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <span className="text-primary-500">+86 178 B04E CC3F</span>
-            </a>
+            <PhoneNumber />
           </p>
         </div>
         <div className="h-[100vh]" />
@@ -230,6 +224,120 @@ const SecondPart = ({ targetRef }: { targetRef: React.RefObject<HTMLDivElement |
           <p>Maintained by Zubmarine</p>
         </div>
       </div>
+    </div>
+  )
+}
+
+const QRCodeSkeleton = () => {
+  return (
+    <motion.div
+      className="w-full aspect-square bg-primary-200 dark:bg-primary-800 rounded-lg"
+      animate={{
+        opacity: [0.5, 0.8, 0.5],
+        scale: [0.98, 1, 0.98]
+      }}
+      transition={{
+        repeat: Infinity,
+        duration: 1.5,
+        ease: "easeInOut"
+      }}
+    />
+  )
+}
+
+interface LazyQRCodeProps {
+  onLoad: (e: React.SyntheticEvent<HTMLImageElement>) => void
+  imageLoaded: boolean
+}
+
+const LazyQRCode = ({ onLoad, imageLoaded }: LazyQRCodeProps) => {
+  const [imageSrc, setImageSrc] = useState<string | null>(null)
+
+  useEffect(() => {
+    // 只在组件挂载后加载图片
+    const img = new Image()
+    img.src = 'https://s1.imagehub.cc/images/2025/04/10/d2a96881ad4298d541445b6ca06609a3.jpg'
+    
+    img.onload = () => {
+      setImageSrc(img.src)
+    }
+
+    return () => {
+      img.onload = null
+    }
+  }, [])
+
+  if (!imageSrc) return null
+
+  return (
+    <motion.img 
+      src={imageSrc}
+      alt="QR Code"
+      className="w-full h-auto rounded-lg shadow-lg"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: imageLoaded ? 1 : 0 }}
+      transition={{ duration: 0.3 }}
+      onLoad={onLoad}
+    />
+  )
+}
+
+const PhoneNumber = () => {
+  const [isImageVisible, setIsImageVisible] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 })
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    setImageLoaded(true)
+    setImageSize({
+      width: e.currentTarget.naturalWidth,
+      height: e.currentTarget.naturalHeight
+    })
+  }
+
+  return (
+    <div className="w-full">
+      <span 
+        className="text-primary-500 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => setIsImageVisible(!isImageVisible)}
+      >
+        +86 178 B04E CC3F
+      </span>
+      
+      <AnimatePresence>
+        {isImageVisible && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ 
+              duration: 0.2,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+            className="mt-2 w-full flex justify-center"
+          >
+            <div 
+              ref={containerRef}
+              className="relative"
+              style={{
+                maxWidth: imageSize.width ? `${imageSize.width}px` : 'none',
+                width: imageSize.width ? `min(${imageSize.width}px, 90vw)` : 'auto'
+              }}
+            >
+              {!imageLoaded && <QRCodeSkeleton />}
+              {isImageVisible && (
+                <Suspense fallback={null}>
+                  <LazyQRCode
+                    onLoad={handleImageLoad}
+                    imageLoaded={imageLoaded}
+                  />
+                </Suspense>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
